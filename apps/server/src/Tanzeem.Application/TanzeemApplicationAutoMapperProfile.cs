@@ -1,4 +1,5 @@
 using AutoMapper;
+using Volo.Abp.AutoMapper;
 
 namespace Tanzeem;
 
@@ -6,8 +7,15 @@ public class TanzeemApplicationAutoMapperProfile : Profile
 {
     public TanzeemApplicationAutoMapperProfile()
     {
-        /* You can configure your AutoMapper mapping configuration here.
-         * Alternatively, you can split your mapping configurations
-         * into multiple profile classes for a better organization. */
+        MapAssignment();
+    }
+
+    private void MapAssignment()
+    {
+        CreateMap<Assignments.Assignment, Assignments.Dtos.AssignmentDto>();
+        CreateMap<Assignments.Dtos.CreateAssignmentDto, Assignments.Assignment>()
+        .Ignore(x => x.Id)
+        .Ignore(x => x.TenantId)
+        ;
     }
 }

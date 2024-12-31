@@ -14,6 +14,7 @@ using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Tanzeem.Assignments;
 
 namespace Tanzeem.EntityFrameworkCore;
 
@@ -57,6 +58,8 @@ public class TanzeemDbContext :
 
     #endregion
 
+    public DbSet<Assignment> Assignments { get; set; }
+
     public TanzeemDbContext(DbContextOptions<TanzeemDbContext> options)
         : base(options)
     {
@@ -78,7 +81,7 @@ public class TanzeemDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
-        
+
         /* Configure your own tables/entities inside here */
 
         //builder.Entity<YourEntity>(b =>

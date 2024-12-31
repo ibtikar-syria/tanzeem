@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Run Backend",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/apps/server/src/Tanzeem.HttpApi.Host/bin/Debug/net9.0/Tanzeem.HttpApi.Host.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/apps/server/src/Tanzeem.HttpApi.Host",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": ".NET Run DbMigrator",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/apps/server/src/Tanzeem.DbMigrator/bin/Debug/net9.0/Tanzeem.DbMigrator.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/apps/server/src/Tanzeem.DbMigrator",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+    ]
+}

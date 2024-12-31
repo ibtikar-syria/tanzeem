@@ -1,0 +1,4 @@
+null:
+
+init:
+    (cd etc/ && bash up.sh)

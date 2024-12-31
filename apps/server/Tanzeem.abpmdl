@@ -1,0 +1,101 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.0.3",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.0.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.0.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.0.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.0.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.0.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.0.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.0.2",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "Tanzeem.Application": {
+      "path": "src/Tanzeem.Application/Tanzeem.Application.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.Application.Tests": {
+      "path": "test/Tanzeem.Application.Tests/Tanzeem.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "Tanzeem.Domain.Shared": {
+      "path": "src/Tanzeem.Domain.Shared/Tanzeem.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.Application.Contracts": {
+      "path": "src/Tanzeem.Application.Contracts/Tanzeem.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.HttpApi": {
+      "path": "src/Tanzeem.HttpApi/Tanzeem.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.HttpApi.Client": {
+      "path": "src/Tanzeem.HttpApi.Client/Tanzeem.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.EntityFrameworkCore.Tests": {
+      "path": "test/Tanzeem.EntityFrameworkCore.Tests/Tanzeem.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "Tanzeem.EntityFrameworkCore": {
+      "path": "src/Tanzeem.EntityFrameworkCore/Tanzeem.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.TestBase": {
+      "path": "test/Tanzeem.TestBase/Tanzeem.TestBase.abppkg",
+      "folder": "test"
+    },
+    "Tanzeem.Domain.Tests": {
+      "path": "test/Tanzeem.Domain.Tests/Tanzeem.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "Tanzeem.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/Tanzeem.HttpApi.Client.ConsoleTestApp/Tanzeem.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "Tanzeem.DbMigrator": {
+      "path": "src/Tanzeem.DbMigrator/Tanzeem.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.HttpApi.Host": {
+      "path": "src/Tanzeem.HttpApi.Host/Tanzeem.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "Tanzeem.Domain": {
+      "path": "src/Tanzeem.Domain/Tanzeem.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

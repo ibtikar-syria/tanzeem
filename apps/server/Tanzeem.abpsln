@@ -1,0 +1,43 @@
+{
+  "id": "303befa6-f68f-495d-99b2-2bf2221ae486",
+  "template": "app",
+  "versions": {
+    "AbpFramework": "9.0.2",
+    "AbpStudio": "0.9.18",
+    "TargetDotnetFramework": "net9.0"
+  },
+  "modules": {
+    "Tanzeem": {
+      "path": "Tanzeem.abpmdl"
+    }
+  },
+  "runProfiles": {
+    "Default": {
+      "path": "etc/abp-studio/run-profiles/Default.abprun.json"
+    }
+  },
+  "options": {
+    "httpRequests": {
+      "ignoredUrls": [
+        "^/metrics$"
+      ]
+    }
+  },
+  "creatingStudioConfiguration": {
+    "template": "app",
+    "createdAbpStudioVersion": "0.9.18",
+    "tiered": "false",
+    "multiTenancy": "true",
+    "includeTests": "true",
+    "uiFramework": "angular",
+    "databaseProvider": "ef",
+    "databaseManagementSystem": "postgresql",
+    "separateTenantSchema": "false",
+    "theme": "leptonx-lite",
+    "themeStyle": "",
+    "mobileFramework": "none",
+    "progressiveWebApp": "false",
+    "publicWebsite": "false",
+    "socialLogin": ""
+  }
+}

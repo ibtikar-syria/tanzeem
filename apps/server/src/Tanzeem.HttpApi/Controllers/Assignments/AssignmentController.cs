@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +24,31 @@ public class AssignmentController : TanzeemController, IAssignmentAppService
         return _assignmentAppService.CreateAsync(input);
     }
 
+    [HttpDelete]
+    [Route("{id}")]
+    public Task DeleteAsync(Guid id)
+    {
+        return _assignmentAppService.DeleteAsync(id);
+    }
+
+    [HttpGet]
+    [Route("{id}")]
+    public Task<AssignmentDto> GetAsync(Guid id)
+    {
+        return _assignmentAppService.GetAsync(id);
+    }
+
     [HttpGet]
     [Route("")]
     public Task<List<AssignmentDto>> GetListAsync()
     {
         return _assignmentAppService.GetListAsync();
+    }
+
+    [HttpPut]
+    [Route("{id}")]
+    public Task<AssignmentDto> UpdateAsync(Guid id, UpdateAssignmentDto input)
+    {
+        return _assignmentAppService.UpdateAsync(id, input);
     }
 }

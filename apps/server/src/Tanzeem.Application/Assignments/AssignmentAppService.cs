@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tanzeem.Assignments.Dtos;
@@ -25,6 +26,20 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         return dto;
     }
 
+    public async Task DeleteAsync(Guid id)
+    {
+        await _assignmentRepository.DeleteAsync(id);
+    }
+
+    public async Task<AssignmentDto> GetAsync(Guid id)
+    {
+        var assignment = await _assignmentRepository.GetAsync(id);
+
+        var dto = ObjectMapper.Map<Assignment, AssignmentDto>(assignment);
+
+        return dto;
+    }
+
     public async Task<List<AssignmentDto>> GetListAsync()
     {
         var assignments = await _assignmentRepository.GetListAsync();
@@ -32,5 +47,18 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         var dtos = ObjectMapper.Map<List<Assignment>, List<AssignmentDto>>(assignments);
 
         return dtos;
+    }
+
+    public async Task<AssignmentDto> UpdateAsync(Guid id, UpdateAssignmentDto input)
+    {
+        var assignment = await _assignmentRepository.GetAsync(id);
+
+        ObjectMapper.Map(input, assignment);
+
+        assignment = await _assignmentRepository.UpdateAsync(assignment, autoSave: true);
+
+        var dto = ObjectMapper.Map<Assignment, AssignmentDto>(assignment);
+
+        return dto;
     }
 }

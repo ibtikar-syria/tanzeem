@@ -17,5 +17,9 @@ public class TanzeemApplicationAutoMapperProfile : Profile
         .Ignore(x => x.Id)
         .Ignore(x => x.TenantId)
         ;
+        CreateMap<Assignments.Dtos.UpdateAssignmentDto, Assignments.Assignment>()
+        .Ignore(x => x.Id)
+        .Ignore(x => x.TenantId)
+        ;
     }
 }

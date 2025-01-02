@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Tanzeem.Assignments.Dtos;
+using Tanzeem.Permissions;
 using Volo.Abp.Application.Services;
 
 namespace Tanzeem.Assignments;
 
+[Authorize(TanzeemPermissions.Assignments.Default)]
 public class AssignmentAppService : ApplicationService, IAssignmentAppService
 {
     private readonly IAssignmentRepository _assignmentRepository;
@@ -15,6 +18,7 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         _assignmentRepository = assignmentRepository;
     }
 
+    [Authorize(TanzeemPermissions.Assignments.Create)]
     public async Task<AssignmentDto> CreateAsync(CreateAssignmentDto input)
     {
         var assignment = ObjectMapper.Map<CreateAssignmentDto, Assignment>(input);
@@ -26,11 +30,13 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         return dto;
     }
 
+    [Authorize(TanzeemPermissions.Assignments.Delete)]
     public async Task DeleteAsync(Guid id)
     {
         await _assignmentRepository.DeleteAsync(id);
     }
 
+    [Authorize(TanzeemPermissions.Assignments.Get)]
     public async Task<AssignmentDto> GetAsync(Guid id)
     {
         var assignment = await _assignmentRepository.GetAsync(id);
@@ -40,6 +46,7 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         return dto;
     }
 
+    [Authorize(TanzeemPermissions.Assignments.GetList)]
     public async Task<List<AssignmentDto>> GetListAsync()
     {
         var assignments = await _assignmentRepository.GetListAsync();
@@ -49,6 +56,7 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         return dtos;
     }
 
+    [Authorize(TanzeemPermissions.Assignments.Update)]
     public async Task<AssignmentDto> UpdateAsync(Guid id, UpdateAssignmentDto input)
     {
         var assignment = await _assignmentRepository.GetAsync(id);

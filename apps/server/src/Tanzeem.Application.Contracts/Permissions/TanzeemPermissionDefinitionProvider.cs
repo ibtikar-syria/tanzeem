@@ -1,7 +1,6 @@
 using Tanzeem.Localization;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Localization;
-using Volo.Abp.MultiTenancy;
 
 namespace Tanzeem.Permissions;
 
@@ -11,8 +10,9 @@ public class TanzeemPermissionDefinitionProvider : PermissionDefinitionProvider
     {
         var myGroup = context.AddGroup(TanzeemPermissions.GroupName);
 
-        //Define your own permissions here. Example:
-        //myGroup.AddPermission(TanzeemPermissions.MyPermission1, L("Permission:MyPermission1"));
+        var assignments = myGroup.AddPermission(TanzeemPermissions.Assignments.Default, L("Permissions:Assignments"));
+        assignments.AddChild(TanzeemPermissions.Assignments.Create, L("Permissions:Assignments.Create"));
+        assignments.AddChild(TanzeemPermissions.Assignments.Get, L("Permissions:Assignments.Get"));
     }
 
     private static LocalizableString L(string name)

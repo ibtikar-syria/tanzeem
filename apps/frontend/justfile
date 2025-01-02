@@ -1,0 +1,4 @@
+null:
+
+generate-schema:
+    NODE_TLS_REJECT_UNAUTHORIZED=0 npx openapi-typescript https://localhost:44326/swagger/v1/swagger.json -o ./schema.d.ts

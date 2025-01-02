@@ -13,10 +13,9 @@ public class Assignment : FullAuditedAggregateRoot<Guid>, IMultiTenant
     {
     }
 
-    public Assignment(Guid id, Guid? tenantId, string title)
+    public Assignment(Guid id, string title)
     {
         Id = id;
-        TenantId = tenantId;
         Title = title;
     }
 }

@@ -3,6 +3,13 @@
   "ignorePatterns": [
     "projects/**/*"
   ],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "prettier"
+  ],
   "overrides": [
     {
       "files": [
@@ -46,5 +53,8 @@
       ],
       "rules": {}
     }
-  ]
+  ],
+  "rules": {
+    "prettier/prettier": "error"
+  }
 }

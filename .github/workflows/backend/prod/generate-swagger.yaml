@@ -1,0 +1,65 @@
+# This workflow will integrate the main branch with the main environment
+name: Generate Swagger file 
+
+on:
+  push:
+    branches:
+      - main
+    path:
+      'server/**'
+
+jobs:
+  generate-swagger:
+    name: Generate Swagger
+    runs-on: ubuntu-latest
+  
+  steps:
+    - name: Checkout code # checkout the code
+      uses: actions/checkout@v2
+
+    # .NET Setup
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x' # change the version to the latest version that used
+    
+    # Restore dependencies
+    - name: Restore dependencies
+      run: |
+        cd server
+        dotnet build --no-restore
+    # Build
+    - name: Build
+      run: |
+        cd server
+        dotnet build
+    # Test 
+    - name: Test
+      run: |
+        cd server
+        dotnet test
+    # Publish 
+    - name: Publish
+      run: |
+        cd server
+        dotnet publish -c Release -o bin/Release/net8.0/publish
+      
+    # Start PostgreSQL
+    - name: Start PostgreSQL Container
+      run: |
+        cd server/etc && docker compose -f docker-compose.infrastructure.yml up -d
+    # Generate Swagger
+    - name: Generate Swagger
+      run: curl -o server/swagger.json http://localhost:5000/swagger/v1/swagger.json
+    
+    # Upload Swagger to artifact
+    - name: Upload Swagger to artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: swagger-json
+        path: server/swagger.json
+    - name: Clean up
+      run: |
+        cd server/etc && docker compose -f docker-compose.infrastructure.yml down
+        rm -rf server/swagger.json
+      

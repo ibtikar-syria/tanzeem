@@ -5,5 +5,5 @@ COPY . ./
 ENV ASPNETCORE_URLS=http://+:80
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=build-env /app/bin .
 ENTRYPOINT ["dotnet", "Tanzeem.HttpApi.Host.dll"]

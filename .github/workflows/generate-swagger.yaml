@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'tanzeem/app/server/**'
+      - 'app/server/**'
 
 jobs:
   generate-swagger:
@@ -26,30 +26,30 @@ jobs:
       # Restore dependencies
       - name: Restore dependencies
         run: |
-          cd tanzeem/app/server
+          cd app/server
           dotnet build --no-restore
       # Publish 
       - name: Publish
         run: |
-          cd tanzeem/app/server
+          cd app/server
           dotnet publish -c Release -o bin/Release/net8.0/publish
         
       # Start PostgreSQL
       - name: Start PostgreSQL Container
         run: |
-          cd tanzeem/app/server/etc && docker compose -f docker-compose.infrastructure.yml up -d
+          cd app/server/etc && docker compose -f docker-compose.infrastructure.yml up -d
       # Generate Swagger
       - name: Generate Swagger
-        run: curl -o tanzeem/app/server/swagger.json http://localhost:5000/swagger/v1/swagger.json
+        run: curl -o app/server/swagger.json http://localhost:5000/swagger/v1/swagger.json
       
       # Upload Swagger to artifact
       - name: Upload Swagger to artifact
         uses: actions/upload-artifact@v4
         with:
           name: swagger-json
-          path: tanzeem/app/server/swagger.json
+          path: app/server/swagger.json
       - name: Clean up
         run: |
-          cd tanzeem/app/server/etc && docker compose -f docker-compose.infrastructure.yml down
-          rm -rf tanzeem/app/server/swagger.json
+          cd app/server/etc && docker compose -f docker-compose.infrastructure.yml down
+          rm -rf app/server/swagger.json
         

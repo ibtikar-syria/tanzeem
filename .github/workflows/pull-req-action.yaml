@@ -20,16 +20,16 @@ jobs:
         uses: docker/setup-buildx-action@v1
       
       # Build docker image
-      - name: Build Docekr image
-        run: docker build -t my-dotnet-app app/server
+      - name: Build Docker image
+        run: docker build -t tanzeem-app app/server
       
       # Run Build and test Commands
       - name: Run Restore dependencies inside Docker
-        run: docker run --rm my-dotnet-app sh -c "cd /app && dotnet build --no-restore"
+        run: docker run --rm tanzeem-app sh -c "cd /app && dotnet build --no-restore"
 
       - name: Build inside docker Container
-        run: docker run --rm my-dotnet-app sh -c "cd /app && dotnet build"
+        run: docker run --rm tanzeem-app sh -c "cd /app && dotnet build"
       
       - name: Test inside docker Container
-        run: docker run --rm my-dotnet-app sh -c "cd /app && dotnet test"
+        run: docker run --rm tanzeem-app sh -c "cd /app && dotnet test"
       

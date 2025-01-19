@@ -1,9 +1,9 @@
 name: Check Pull Requests
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - demo
     paths:
       - 'tanzeem/app/server/**'
 
@@ -21,7 +21,7 @@ jobs:
       
       # Build docker image
       - name: Build Docekr image
-        run: docker build -t my-dotnet-app tanzeem/app/server
+        run: docker build -t tanzeem-app tanzeem/app/server
       
       # Run Build and test Commands
       - name: Run Restore dependencies inside Docker

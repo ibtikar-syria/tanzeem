@@ -3,7 +3,7 @@ name: Check Pull Requests
 on:
   pull_request:
     branches:
-      - main
+      - demo
     paths:
       - 'tanzeem/app/server/**'
 

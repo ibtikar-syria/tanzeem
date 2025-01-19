@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'app/server/**'
+      - 'tanzeem/app/server/**'
 
 jobs:
   generate-swagger:
@@ -52,4 +52,4 @@ jobs:
         run: |
           cd tanzeem/app/server/etc && docker compose -f docker-compose.infrastructure.yml down
           rm -rf tanzeem/app/server/swagger.json
-      
+        

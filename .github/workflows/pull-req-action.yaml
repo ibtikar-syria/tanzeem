@@ -5,7 +5,7 @@ on:
     branches:
       - demo
     paths:
-      - 'app/server/**'
+      - 'apps/server/**'
 
 jobs:
   check-pull-requests:
@@ -21,7 +21,7 @@ jobs:
       
       # Build docker image
       - name: Build Docker image
-        run: docker build -t tanzeem-app app/server
+        run: docker build -t tanzeem-app apps/server
       
       # Run Build and test Commands
       - name: Run Restore dependencies inside Docker

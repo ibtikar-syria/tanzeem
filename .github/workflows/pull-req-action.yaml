@@ -32,4 +32,3 @@ jobs:
       
       - name: Test inside docker Container
         run: docker run --rm tanzeem-app sh -c "cd /app && dotnet test"
-      

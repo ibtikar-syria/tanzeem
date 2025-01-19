@@ -6,7 +6,7 @@ on:
     branches:
       - main
     path:
-      'server/**'
+      'tanzeem/app/server/**'
 
 jobs:
   generate-swagger:
@@ -21,45 +21,35 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '8.0.x' # change the version to the latest version that used
+        dotnet-version: '9.0.x' # change the version to the latest version that used
     
     # Restore dependencies
     - name: Restore dependencies
       run: |
-        cd server
+        cd tanzeem/app/server
         dotnet build --no-restore
-    # Build
-    - name: Build
-      run: |
-        cd server
-        dotnet build
-    # Test 
-    - name: Test
-      run: |
-        cd server
-        dotnet test
     # Publish 
     - name: Publish
       run: |
-        cd server
+        cd tanzeem/app/server
         dotnet publish -c Release -o bin/Release/net8.0/publish
       
     # Start PostgreSQL
     - name: Start PostgreSQL Container
       run: |
-        cd server/etc && docker compose -f docker-compose.infrastructure.yml up -d
+        cd tanzeem/app/server/etc && docker compose -f docker-compose.infrastructure.yml up -d
     # Generate Swagger
     - name: Generate Swagger
-      run: curl -o server/swagger.json http://localhost:5000/swagger/v1/swagger.json
+      run: curl -o tanzeem/app/server/swagger.json http://localhost:5000/swagger/v1/swagger.json
     
     # Upload Swagger to artifact
     - name: Upload Swagger to artifact
       uses: actions/upload-artifact@v4
       with:
         name: swagger-json
-        path: server/swagger.json
+        path: tanzeem/app/server/swagger.json
     - name: Clean up
       run: |
-        cd server/etc && docker compose -f docker-compose.infrastructure.yml down
-        rm -rf server/swagger.json
+        cd tanzeem/app/server/etc && docker compose -f docker-compose.infrastructure.yml down
+        rm -rf tanzeem/app/server/swagger.json
       

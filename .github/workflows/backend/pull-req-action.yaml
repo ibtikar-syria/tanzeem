@@ -8,17 +8,22 @@ on:
       - './apps/server/**'
 
 jobs:
-  check-pull-requests:
-    name: Check Pull Requests
+  build:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    defaults:
+      run:
+        working-directory: ./apps/server
 
-      - name: Setup Docker
-        uses: docker/setup-buildx-action@v1
-      
-      - name: Build CI Docker image for verifying build and tests
-        run: docker build -f ./apps/server/ci.Dockerfile -t tanzeem-app ./apps/server
-      
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 9.0.x
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal

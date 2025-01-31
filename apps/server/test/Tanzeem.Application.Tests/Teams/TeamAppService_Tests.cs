@@ -373,6 +373,76 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         Assert.Equal("Team 1.1.1.2.2", second4thChild.Title);
     }
 
-    // TODO(adnanjpg): test that the sortChildrenBy parameter is working
+    [Fact]
+    public async Task Should_Get_Team_With_Sorted_Children()
+    {
+        // Arrange
+        var teams = new List<Team>
+        {
+            new(id: Guid.NewGuid(), title: "Team 1"),
+            new(id: Guid.NewGuid(), title: "Team 2")
+        };
 
+        teams[0].AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1"));
+        teams[0].Children.ElementAt(0).CreationTime = DateTime.Now;
+        teams[0].AddTeam(new(id: Guid.NewGuid(), title: "Team 1.2"));
+        teams[0].Children.ElementAt(1).CreationTime = DateTime.Now.AddDays(-1);
+
+
+        teams[0].Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1"));
+
+
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.1")); teams[0].Children.ElementAt(0).Children.ElementAt(0).Children.ElementAt(0).CreationTime = DateTime.Now;
+
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.2"));
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).Children.ElementAt(1).CreationTime = DateTime.Now.AddDays(-2);
+
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.3"));
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).Children.ElementAt(2).CreationTime = DateTime.Now.AddDays(-1);
+
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.4"));
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).Children.ElementAt(3).CreationTime = DateTime.Now.AddDays(-1);
+
+        await _teamRepository.InsertManyAsync(teams);
+
+        var service = GetRequiredService<ITeamAppService>();
+
+        // Act
+
+        var result = await service.GetDetailAsync(teams[0].Id, depth: 4, sortChildrenBy: "CreationTime desc, Title asc");
+
+        // Assert
+
+        var firstChild = result.Children.ElementAt(0);
+        var secondChild = result.Children.ElementAt(1);
+        var first2ndChild = firstChild.Children.ElementAt(0);
+        var first3rdChild = first2ndChild.Children.ElementAt(0);
+        var second3rdChild = first2ndChild.Children.ElementAt(1);
+        var third3rdChild = first2ndChild.Children.ElementAt(2);
+        var fourth3rdChild = first2ndChild.Children.ElementAt(3);
+
+        Assert.NotNull(result);
+        Assert.NotNull(firstChild);
+        Assert.NotNull(secondChild);
+        Assert.NotNull(first2ndChild);
+        Assert.NotNull(first3rdChild);
+        Assert.NotNull(second3rdChild);
+
+        Assert.Equal(2, result.Children.Count);
+        Assert.Equal("Team 1.1", firstChild.Title);
+        Assert.Equal("Team 1.2", secondChild.Title);
+
+        Assert.Single(firstChild.Children);
+        Assert.Equal("Team 1.1.1", first2ndChild.Title);
+
+        Assert.Equal(4, first2ndChild.Children.Count);
+        // now
+        Assert.Equal("Team 1.1.1.1", first3rdChild.Title);
+        // 1 day ago, name bigger
+        Assert.Equal("Team 1.1.1.4", second3rdChild.Title);
+        // 1 day ago, name smaller
+        Assert.Equal("Team 1.1.1.3", third3rdChild.Title);
+        // 2 days ago
+        Assert.Equal("Team 1.1.1.2", fourth3rdChild.Title);
+    }
 }

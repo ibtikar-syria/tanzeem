@@ -10,6 +10,7 @@ using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Guids;
 using Microsoft.EntityFrameworkCore.Query;
+using Volo.Abp.Domain.Entities;
 
 namespace Tanzeem.Teams;
 
@@ -82,8 +83,6 @@ public class TeamRepository : EfCoreRepository<TanzeemDbContext, Team, Guid>, IT
         queryable = queryable
             .Include(x => x.TeamUsers);
 
-        var r = queryable.Include(x => x.Children).ThenInclude(x => x.Children).ThenInclude(x => x.Children);
-
         Team? team;
 
         if (depth == 1)
@@ -117,8 +116,16 @@ public class TeamRepository : EfCoreRepository<TanzeemDbContext, Team, Guid>, IT
             team = await includedQueryable.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        // loop all sub-teams, and sort them by the given property
+        if (team == null)
+        {
+            throw new EntityNotFoundException(typeof(Team), id);
+        }
 
+        // loop all sub-teams, and sort them by the given property
+        if (sortChildrenBy != null)
+        {
+            team.SortAllChildrenBy(sortChildrenBy);
+        }
 
         return team;
     }

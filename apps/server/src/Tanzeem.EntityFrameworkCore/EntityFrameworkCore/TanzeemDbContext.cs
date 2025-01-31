@@ -5,7 +5,6 @@ using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -59,6 +58,7 @@ public class TanzeemDbContext :
     #endregion
 
     public DbSet<Assignment> Assignments { get; set; }
+    public DbSet<AssignmentUser> AssignmentUsers { get; set; }
 
     public TanzeemDbContext(DbContextOptions<TanzeemDbContext> options)
         : base(options)

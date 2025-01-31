@@ -8,9 +8,10 @@ namespace Tanzeem.Assignments;
 
 public interface IAssignmentAppService : IApplicationService
 {
-    Task<List<AssignmentDto>> GetListAsync();
+    Task<List<AssignmentDto>> GetListAsync(GetAssignmentListFilter filter);
     Task<AssignmentDto> GetAsync(Guid id);
     Task DeleteAsync(Guid id);
     Task<AssignmentDto> UpdateAsync(Guid id, UpdateAssignmentDto input);
     Task<AssignmentDto> CreateAsync(CreateAssignmentDto input);
+    Task AssignUsersAsync(Guid assignmentId, List<Guid> userIds);
 }

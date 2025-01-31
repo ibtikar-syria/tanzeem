@@ -1,4 +1,5 @@
 using AutoMapper;
+using Tanzeem.Assignments.Dtos;
 using Volo.Abp.AutoMapper;
 
 namespace Tanzeem;
@@ -21,5 +22,7 @@ public class TanzeemApplicationAutoMapperProfile : Profile
         .Ignore(x => x.Id)
         .Ignore(x => x.TenantId)
         ;
+        CreateMap<GetAssignmentListFilter, AssignmentListFilter>();
+
     }
 }

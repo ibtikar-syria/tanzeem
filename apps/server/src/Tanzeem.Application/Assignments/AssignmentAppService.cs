@@ -18,6 +18,7 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         _assignmentRepository = assignmentRepository;
     }
 
+
     [Authorize(TanzeemPermissions.Assignments.Create)]
     public async Task<AssignmentDto> CreateAsync(CreateAssignmentDto input)
     {
@@ -47,9 +48,11 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
     }
 
     [Authorize(TanzeemPermissions.Assignments.GetList)]
-    public async Task<List<AssignmentDto>> GetListAsync()
+    public async Task<List<AssignmentDto>> GetListAsync(GetAssignmentListFilter filter)
     {
-        var assignments = await _assignmentRepository.GetListAsync();
+        var mappedFilter = ObjectMapper.Map<GetAssignmentListFilter, AssignmentListFilter>(filter);
+
+        var assignments = await _assignmentRepository.GetListAsync(mappedFilter);
 
         var dtos = ObjectMapper.Map<List<Assignment>, List<AssignmentDto>>(assignments);
 
@@ -68,5 +71,12 @@ public class AssignmentAppService : ApplicationService, IAssignmentAppService
         var dto = ObjectMapper.Map<Assignment, AssignmentDto>(assignment);
 
         return dto;
+    }
+
+
+    [Authorize(TanzeemPermissions.Assignments.AssignUsers)]
+    public async Task AssignUsersAsync(Guid assignmentId, List<Guid> userIds)
+    {
+        await _assignmentRepository.AssignUsersAsync(assignmentId, userIds);
     }
 }

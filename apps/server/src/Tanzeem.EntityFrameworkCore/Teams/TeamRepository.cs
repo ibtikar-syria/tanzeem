@@ -9,6 +9,7 @@ using Tanzeem.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Guids;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Tanzeem.Teams;
 
@@ -60,15 +61,65 @@ public class TeamRepository : EfCoreRepository<TanzeemDbContext, Team, Guid>, IT
     {
         var queryable = await GetQueryableAsync();
 
-        var result = queryable
-            .Include(x => x.TeamUsers)
+        queryable = queryable
+            .Include(x => x.TeamUsers);
+
+        queryable = queryable
             .WhereIf(!filter.TitleContains.IsNullOrWhiteSpace(), x => x.Title.Contains(filter.TitleContains!))
             .WhereIf(filter.TeamIds != null && filter.TeamIds?.Count > 0, x => filter.TeamIds!.Contains(x.Id))
             .WhereIf(filter.ParentId != null, x => x.ParentId == filter.ParentId)
             .WhereIf(filter.AssignedUserIds != null && filter.AssignedUserIds?.Count > 0, x => x.TeamUsers.Any(au => filter.AssignedUserIds!.Contains(au.UserId)));
 
-        var list = await result.ToListAsync();
+        var list = await queryable.ToListAsync();
 
         return list;
+    }
+
+    public async Task<Team?> GetDetailAsync(Guid id, int depth, bool includeDetails, string? sortChildrenBy)
+    {
+        var queryable = await GetQueryableAsync();
+
+        queryable = queryable
+            .Include(x => x.TeamUsers);
+
+        var r = queryable.Include(x => x.Children).ThenInclude(x => x.Children).ThenInclude(x => x.Children);
+
+        Team? team;
+
+        if (depth == 1)
+        {
+            queryable = queryable.Include(x => x.Children);
+
+            team = await queryable.FirstOrDefaultAsync(x => x.Id == id);
+        }
+        else if (depth == 2)
+        {
+            var includedQueryable = queryable.Include(x => x.Children).ThenInclude(
+                    x => x.Children
+                );
+
+            team = await includedQueryable.FirstOrDefaultAsync(x => x.Id == id);
+        }
+        else
+        {
+            // queryable.Include returns a different type than includedQueryable.ThenInclude,
+            // so we assign it and then start the loop from 2
+            var includedQueryable = queryable.Include(x => x.Children).ThenInclude(
+                x => x.Children
+            );
+            for (var i = 2; i < depth; i++)
+            {
+                includedQueryable = includedQueryable.ThenInclude(
+                   x => x.Children
+               );
+            }
+
+            team = await includedQueryable.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        // loop all sub-teams, and sort them by the given property
+
+
+        return team;
     }
 }

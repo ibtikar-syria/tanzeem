@@ -14,4 +14,5 @@ public interface ITeamAppService : IApplicationService
     Task<TeamDto> UpdateAsync(Guid id, UpdateTeamDto input);
     Task<TeamDto> CreateAsync(CreateTeamDto input);
     Task AssignUsersAsync(Guid teamId, List<Guid> userIds);
+    public Task<TeamDetailDto> GetDetailAsync(Guid id, int depth = 0, bool includeDetails = true, string? sortChildrenBy = null);
 }

@@ -58,4 +58,11 @@ public class TeamController : TanzeemController, ITeamAppService
     {
         return _teamAppService.AssignUsersAsync(teamId, userIds);
     }
+
+    [HttpGet]
+    [Route("{id}/detail")]
+    public Task<TeamDetailDto> GetDetailAsync(Guid id, int depth, bool includeDetails, string? sortChildrenBy)
+    {
+        return _teamAppService.GetDetailAsync(id, depth, includeDetails, sortChildrenBy);
+    }
 }

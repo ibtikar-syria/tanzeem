@@ -240,4 +240,139 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         Assert.NotNull(found);
         Assert.Equal(first.Title, found.Title);
     }
+
+    private async Task<List<Team>> SeedTeamsWithHierarchy()
+    {
+        var teams = new List<Team>
+        {
+            new(id: Guid.NewGuid(), title: "Team 1"),
+            new(id: Guid.NewGuid(), title: "Team 2")
+        };
+
+        teams[0].AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1"));
+        teams[0].AddTeam(new(id: Guid.NewGuid(), title: "Team 1.2"));
+
+        teams[0].Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1"));
+
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.1"));
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.2"));
+
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).Children.ElementAt(1).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.2.1"));
+        teams[0].Children.ElementAt(0).Children.ElementAt(0).Children.ElementAt(1).AddTeam(new(id: Guid.NewGuid(), title: "Team 1.1.1.2.2"));
+
+        await _teamRepository.InsertManyAsync(teams);
+
+        return teams;
+    }
+
+    [Fact]
+    public async Task Should_Get_Team_With_Depth_1()
+    {
+        var teams = await SeedTeamsWithHierarchy();
+
+        var service = GetRequiredService<ITeamAppService>();
+
+        var result = await service.GetDetailAsync(teams[0].Id, depth: 1, sortChildrenBy: "Title asc");
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Children.Count);
+        Assert.Equal("Team 1.1", result.Children.ElementAt(0).Title);
+        Assert.Equal("Team 1.2", result.Children.ElementAt(1).Title);
+    }
+
+    [Fact]
+    public async Task Should_Get_Team_With_Depth_2()
+    {
+        var teams = await SeedTeamsWithHierarchy();
+
+        var service = GetRequiredService<ITeamAppService>();
+
+        var result = await service.GetDetailAsync(teams[0].Id, depth: 2, sortChildrenBy: "Title asc");
+
+        var firstChild = result.Children.ElementAt(0);
+        var secondChild = result.Children.ElementAt(1);
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Children.Count);
+        Assert.Equal("Team 1.1", firstChild.Title);
+        Assert.Equal("Team 1.2", secondChild.Title);
+
+        Assert.Single(firstChild.Children);
+        Assert.Equal("Team 1.1.1", firstChild.Children.ElementAt(0).Title);
+    }
+
+    [Fact]
+    public async Task Should_Get_Team_With_Depth_3()
+    {
+        var teams = await SeedTeamsWithHierarchy();
+
+        var service = GetRequiredService<ITeamAppService>();
+
+        var result = await service.GetDetailAsync(teams[0].Id, depth: 3, sortChildrenBy: "Title asc");
+
+        var firstChild = result.Children.ElementAt(0);
+        var first2ndChild = firstChild.Children.ElementAt(0);
+        var first3rdChild = first2ndChild.Children.ElementAt(0);
+        var second3rdChild = first2ndChild.Children.ElementAt(1);
+
+        Assert.NotNull(result);
+        Assert.NotNull(firstChild);
+        Assert.NotNull(first2ndChild);
+        Assert.NotNull(first3rdChild);
+        Assert.NotNull(second3rdChild);
+
+        Assert.Equal(2, result.Children.Count);
+        Assert.Equal("Team 1.1", firstChild.Title);
+
+        Assert.Single(firstChild.Children);
+        Assert.Equal("Team 1.1.1", first2ndChild.Title);
+
+        Assert.Equal(2, first2ndChild.Children.Count);
+        Assert.Equal("Team 1.1.1.1", first3rdChild.Title);
+        Assert.Equal("Team 1.1.1.2", second3rdChild.Title);
+    }
+
+    [Fact]
+    public async Task Should_Get_Team_With_Depth_4()
+    {
+        var teams = await SeedTeamsWithHierarchy();
+
+        var service = GetRequiredService<ITeamAppService>();
+
+        var result = await service.GetDetailAsync(teams[0].Id, depth: 4, sortChildrenBy: "Title asc");
+
+        var firstChild = result.Children.ElementAt(0);
+        var first2ndChild = firstChild.Children.ElementAt(0);
+        var first3rdChild = first2ndChild.Children.ElementAt(0);
+        var second3rdChild = first2ndChild.Children.ElementAt(1);
+        var first4thChild = second3rdChild.Children.ElementAt(0);
+        var second4thChild = second3rdChild.Children.ElementAt(1);
+
+        Assert.NotNull(result);
+        Assert.NotNull(firstChild);
+        Assert.NotNull(first2ndChild);
+        Assert.NotNull(first3rdChild);
+        Assert.NotNull(second3rdChild);
+        Assert.NotNull(first4thChild);
+        Assert.NotNull(second4thChild);
+
+        Assert.Equal(2, result.Children.Count);
+        Assert.Equal("Team 1.1", firstChild.Title);
+
+        Assert.Single(firstChild.Children);
+        Assert.Equal("Team 1.1.1", first2ndChild.Title);
+
+        Assert.Equal(2, first2ndChild.Children.Count);
+        Assert.Equal("Team 1.1.1.1", first3rdChild.Title);
+        Assert.Equal("Team 1.1.1.2", second3rdChild.Title);
+
+        Assert.Empty(first3rdChild.Children);
+
+        Assert.Equal(2, second3rdChild.Children.Count);
+        Assert.Equal("Team 1.1.1.2.1", first4thChild.Title);
+        Assert.Equal("Team 1.1.1.2.2", second4thChild.Title);
+    }
+
+    // TODO(adnanjpg): test that the sortChildrenBy parameter is working
+
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Tanzeem.Teams.Dtos;
 using Tanzeem.Permissions;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Entities;
 
 namespace Tanzeem.Teams;
 
@@ -78,5 +79,20 @@ public class TeamAppService : ApplicationService, ITeamAppService
     public async Task AssignUsersAsync(Guid teamId, List<Guid> userIds)
     {
         await _teamRepository.AssignUsersAsync(teamId, userIds);
+    }
+
+    [Authorize(TanzeemPermissions.Teams.Get)]
+    public async Task<TeamDetailDto> GetDetailAsync(Guid id, int depth, bool includeDetails, string? sortChildrenBy)
+    {
+        var team = await _teamRepository.GetDetailAsync(id, depth, includeDetails, sortChildrenBy);
+
+        if (team == null)
+        {
+            throw new EntityNotFoundException(typeof(Team), id);
+        }
+
+        var dto = ObjectMapper.Map<Team, TeamDetailDto>(team);
+
+        return dto;
     }
 }

@@ -14,6 +14,7 @@ using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Tanzeem.Assignments;
+using Tanzeem.Teams;
 
 namespace Tanzeem.EntityFrameworkCore;
 
@@ -59,6 +60,8 @@ public class TanzeemDbContext :
 
     public DbSet<Assignment> Assignments { get; set; }
     public DbSet<AssignmentUser> AssignmentUsers { get; set; }
+    public DbSet<Team> Teams { get; set; }
+    public DbSet<TeamUser> TeamUsers { get; set; }
 
     public TanzeemDbContext(DbContextOptions<TanzeemDbContext> options)
         : base(options)

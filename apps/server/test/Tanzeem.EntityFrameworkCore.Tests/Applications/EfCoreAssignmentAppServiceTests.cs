@@ -1,6 +1,7 @@
 using Tanzeem.Assignments;
+using Tanzeem.EntityFrameworkCore;
 
-namespace Tanzeem.EntityFrameworkCore.Assignments;
+namespace Tanzeem.Applications;
 
 public class EfCoreAssignmentAppServiceTests : AssignmentAppService_Tests<TanzeemEntityFrameworkCoreTestModule>
 {

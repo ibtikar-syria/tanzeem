@@ -21,4 +21,15 @@ public static class TanzeemPermissions
         public const string Delete = Default + ".Delete";
         public const string AssignUsers = Default + ".AssignUsers";
     }
+
+    public class Teams
+    {
+        public const string Default = GroupName + ".Teams";
+        public const string Create = Default + ".Create";
+        public const string Get = Default + ".Get";
+        public const string GetList = Default + ".GetList";
+        public const string Update = Default + ".Update";
+        public const string Delete = Default + ".Delete";
+        public const string AssignUsers = Default + ".AssignUsers";
+    }
 }

@@ -1,6 +1,3 @@
-using System;
-using Volo.Abp.Application.Dtos;
-
 namespace Tanzeem.Assignments.Dtos;
 
 public class CreateAssignmentDto

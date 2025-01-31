@@ -19,5 +19,6 @@ public static class TanzeemPermissions
         public const string GetList = Default + ".GetList";
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";
+        public const string AssignUsers = Default + ".AssignUsers";
     }
 }

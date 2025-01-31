@@ -1,9 +1,9 @@
 {
-  "Culture": "en",
-  "Texts": {
-    "AppName": "Tanzeem",
-    "Menu:Home": "Home",
-    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information visit",
-    "Welcome": "Welcome"
-  }
+    "Permissions:Assignments": "Assignments",
+    "Permissions:Assignments.Create": "Create",
+    "Permissions:Assignments.Get": "Get",
+    "Permissions:Assignments.GetList": "GetList",
+    "Permissions:Assignments.Update": "Update",
+    "Permissions:Assignments.Delete": "Delete",
+    "Permissions:Assignments.AssignUsers": "AssignUsers"
 }

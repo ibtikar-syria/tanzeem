@@ -40,9 +40,9 @@ public class AssignmentController : TanzeemController, IAssignmentAppService
 
     [HttpGet]
     [Route("")]
-    public Task<List<AssignmentDto>> GetListAsync()
+    public Task<List<AssignmentDto>> GetListAsync(GetAssignmentListFilter filter)
     {
-        return _assignmentAppService.GetListAsync();
+        return _assignmentAppService.GetListAsync(filter);
     }
 
     [HttpPut]
@@ -50,5 +50,12 @@ public class AssignmentController : TanzeemController, IAssignmentAppService
     public Task<AssignmentDto> UpdateAsync(Guid id, UpdateAssignmentDto input)
     {
         return _assignmentAppService.UpdateAsync(id, input);
+    }
+
+    [HttpPost]
+    [Route("{assignmentId}/assign-users")]
+    public Task AssignUsersAsync(Guid assignmentId, List<Guid> userIds)
+    {
+        return _assignmentAppService.AssignUsersAsync(assignmentId, userIds);
     }
 }

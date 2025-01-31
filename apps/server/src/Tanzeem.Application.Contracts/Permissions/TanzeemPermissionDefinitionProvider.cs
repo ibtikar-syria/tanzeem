@@ -16,6 +16,7 @@ public class TanzeemPermissionDefinitionProvider : PermissionDefinitionProvider
         assignments.AddChild(TanzeemPermissions.Assignments.GetList, L("Permissions:Assignments.GetList"));
         assignments.AddChild(TanzeemPermissions.Assignments.Update, L("Permissions:Assignments.Update"));
         assignments.AddChild(TanzeemPermissions.Assignments.Delete, L("Permissions:Assignments.Delete"));
+        assignments.AddChild(TanzeemPermissions.Assignments.AssignUsers, L("Permissions:Assignments.AssignUsers"));
     }
 
     private static LocalizableString L(string name)

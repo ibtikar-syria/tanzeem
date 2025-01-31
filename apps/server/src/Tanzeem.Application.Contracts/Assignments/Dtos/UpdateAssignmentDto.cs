@@ -1,11 +1,6 @@
 namespace Tanzeem.Assignments.Dtos;
 
-public class UpdateAssignmentDto
+public class UpdateAssignmentDto(string title)
 {
-    public string Title { get; set; }
-
-    public UpdateAssignmentDto(string title)
-    {
-        Title = title;
-    }
+    public string Title { get; set; } = title;
 }

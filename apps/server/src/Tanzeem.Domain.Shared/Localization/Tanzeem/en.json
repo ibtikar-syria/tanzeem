@@ -5,5 +5,12 @@
     "Permissions:Assignments.GetList": "GetList",
     "Permissions:Assignments.Update": "Update",
     "Permissions:Assignments.Delete": "Delete",
-    "Permissions:Assignments.AssignUsers": "AssignUsers"
+    "Permissions:Assignments.AssignUsers": "AssignUsers",
+    "Permissions:Teams": "Teams",
+    "Permissions:Teams.Create": "Create",
+    "Permissions:Teams.Get": "Get",
+    "Permissions:Teams.GetList": "GetList",
+    "Permissions:Teams.Update": "Update",
+    "Permissions:Teams.Delete": "Delete",
+    "Permissions:Teams.AssignUsers": "AssignUsers"
 }

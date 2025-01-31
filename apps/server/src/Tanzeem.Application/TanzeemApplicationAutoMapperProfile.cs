@@ -1,5 +1,8 @@
 using AutoMapper;
+using Tanzeem.Assignments;
 using Tanzeem.Assignments.Dtos;
+using Tanzeem.Teams;
+using Tanzeem.Teams.Dtos;
 using Volo.Abp.AutoMapper;
 
 namespace Tanzeem;
@@ -13,16 +16,31 @@ public class TanzeemApplicationAutoMapperProfile : Profile
 
     private void MapAssignment()
     {
-        CreateMap<Assignments.Assignment, Assignments.Dtos.AssignmentDto>();
-        CreateMap<Assignments.Dtos.CreateAssignmentDto, Assignments.Assignment>()
+
+        #region Assignment
+        CreateMap<Assignment, AssignmentDto>();
+        CreateMap<CreateAssignmentDto, Assignment>()
         .Ignore(x => x.Id)
         .Ignore(x => x.TenantId)
         ;
-        CreateMap<Assignments.Dtos.UpdateAssignmentDto, Assignments.Assignment>()
+        CreateMap<UpdateAssignmentDto, Assignment>()
         .Ignore(x => x.Id)
         .Ignore(x => x.TenantId)
         ;
         CreateMap<GetAssignmentListFilter, AssignmentListFilter>();
+        #endregion
 
+        #region Team
+        CreateMap<Team, TeamDto>();
+        CreateMap<CreateTeamDto, Team>()
+        .Ignore(x => x.Id)
+        .Ignore(x => x.TenantId)
+        ;
+        CreateMap<UpdateTeamDto, Team>()
+        .Ignore(x => x.Id)
+        .Ignore(x => x.TenantId)
+        ;
+        CreateMap<GetTeamListFilter, TeamListFilter>();
+        #endregion
     }
 }

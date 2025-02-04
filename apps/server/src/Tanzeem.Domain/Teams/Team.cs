@@ -4,6 +4,7 @@ using System.Linq;
 using Volo.Abp.Domain.Entities.Auditing;
 using System.Linq.Dynamic.Core;
 using Volo.Abp.MultiTenancy;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tanzeem.Teams;
 
@@ -12,12 +13,12 @@ public class Team : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public virtual Guid? TenantId { get; set; }
 
     public virtual Guid? ParentId { get; set; }
-    public virtual Team Parent { get; set; }
-    public virtual ICollection<Team> Children { get; set; }
+    public virtual Team? Parent { get; set; }
 
-    public virtual string Title { get; set; }
+    public required virtual string Title { get; set; }
 
-    public virtual ICollection<TeamUser> TeamUsers { get; set; }
+    public required virtual ICollection<Team> Children { get; set; } = [];
+    public required virtual ICollection<TeamUser> TeamUsers { get; set; } = [];
 
     /// <summary>
     /// Assigns users to the Team.
@@ -68,7 +69,8 @@ public class Team : FullAuditedAggregateRoot<Guid>, IMultiTenant
             return;
         }
 
-        Children = [.. Children.AsQueryable().OrderBy(sortChildrenBy)];
+        var queryable = Children.AsQueryable();
+        Children = [.. queryable.OrderBy(sortChildrenBy)];
 
         foreach (var child in Children)
         {
@@ -80,9 +82,18 @@ public class Team : FullAuditedAggregateRoot<Guid>, IMultiTenant
     {
     }
 
+    [SetsRequiredMembers]
     public Team(Guid id, string title)
     {
         Id = id;
         Title = title;
+    }
+
+    [SetsRequiredMembers]
+    public Team(Guid id, string title, List<Team> children)
+    {
+        Id = id;
+        Title = title;
+        Children = children;
     }
 }

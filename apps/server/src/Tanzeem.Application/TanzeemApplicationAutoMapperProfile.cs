@@ -32,7 +32,7 @@ public class TanzeemApplicationAutoMapperProfile : Profile
 
         #region Team
         CreateMap<Team, TeamDto>();
-        CreateMap<Team, TeamDetailDto>();
+        CreateMap<TeamDetailQueryDto, TeamDetailDto>();
         CreateMap<CreateTeamDto, Team>()
         .Ignore(x => x.Id)
         .Ignore(x => x.TenantId)

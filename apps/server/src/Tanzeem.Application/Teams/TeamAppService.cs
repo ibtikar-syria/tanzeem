@@ -91,7 +91,7 @@ public class TeamAppService : ApplicationService, ITeamAppService
             throw new EntityNotFoundException(typeof(Team), id);
         }
 
-        var dto = ObjectMapper.Map<Team, TeamDetailDto>(team);
+        var dto = ObjectMapper.Map<TeamDetailQueryDto, TeamDetailDto>(team);
 
         return dto;
     }

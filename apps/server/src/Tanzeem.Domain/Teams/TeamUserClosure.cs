@@ -5,21 +5,23 @@ using Volo.Abp.Identity;
 
 namespace Tanzeem.Teams;
 
-public class TeamUser : FullAuditedEntity<Guid>
+public class TeamUserClosure : FullAuditedEntity<Guid>
 {
     public required virtual Guid TeamId { get; set; }
+    public required virtual int Depth { get; set; }
     public required virtual Guid UserId { get; set; }
 
     public virtual Team? Team { get; set; }
     public virtual IdentityUser? User { get; set; }
 
-    protected TeamUser() { }
+    protected TeamUserClosure() { }
 
     [SetsRequiredMembers]
-    public TeamUser(Guid id, Guid teamId, Guid userId)
+    public TeamUserClosure(Guid id, Guid teamId, Guid userId, int depth)
     {
         Id = id;
         TeamId = teamId;
         UserId = userId;
+        Depth = depth;
     }
 }

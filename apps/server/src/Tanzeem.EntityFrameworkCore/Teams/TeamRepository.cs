@@ -9,8 +9,7 @@ using Tanzeem.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Guids;
-using Microsoft.EntityFrameworkCore.Query;
-using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Repositories;
 
 namespace Tanzeem.Teams;
 
@@ -22,13 +21,11 @@ public static class TeamEfCoreQueryableExtensions
     }
 }
 
-public class TeamRepository : EfCoreRepository<TanzeemDbContext, Team, Guid>, ITeamRepository
+public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvider, IGuidGenerator guidGenerator, IRepository<TeamUserClosure, Guid> teamUserClosureRepository, IRepository<TeamClosure, Guid> teamClosureRepository) : EfCoreRepository<TanzeemDbContext, Team, Guid>(dbContextProvider), ITeamRepository
 {
-    private readonly IGuidGenerator _guidGenerator;
-    public TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvider, IGuidGenerator guidGenerator) : base(dbContextProvider)
-    {
-        _guidGenerator = guidGenerator;
-    }
+    private readonly IGuidGenerator _guidGenerator = guidGenerator;
+    private readonly IRepository<TeamUserClosure, Guid> _teamUserClosureRepository = teamUserClosureRepository;
+    private readonly IRepository<TeamClosure, Guid> _teamClosureRepository = teamClosureRepository;
 
     public override async Task<IQueryable<Team>> WithDetailsAsync()
     {
@@ -76,56 +73,99 @@ public class TeamRepository : EfCoreRepository<TanzeemDbContext, Team, Guid>, IT
         return list;
     }
 
-    public async Task<Team?> GetDetailAsync(Guid id, int depth, bool includeDetails, string? sortChildrenBy)
+    public async Task<TeamDetailQueryDto?> GetDetailAsync(Guid id, int depth, bool includeDetails, string? sortChildrenBy)
     {
         var queryable = await GetQueryableAsync();
 
         queryable = queryable
             .Include(x => x.TeamUsers);
 
-        Team? team;
-
-        if (depth == 1)
-        {
-            queryable = queryable.Include(x => x.Children);
-
-            team = await queryable.FirstOrDefaultAsync(x => x.Id == id);
-        }
-        else if (depth == 2)
-        {
-            var includedQueryable = queryable.Include(x => x.Children).ThenInclude(
-                    x => x.Children
-                );
-
-            team = await includedQueryable.FirstOrDefaultAsync(x => x.Id == id);
-        }
-        else
-        {
-            // queryable.Include returns a different type than includedQueryable.ThenInclude,
-            // so we assign it and then start the loop from 2
-            var includedQueryable = queryable.Include(x => x.Children).ThenInclude(
-                x => x.Children
-            );
-            for (var i = 2; i < depth; i++)
-            {
-                includedQueryable = includedQueryable.ThenInclude(
-                   x => x.Children
-               );
-            }
-
-            team = await includedQueryable.FirstOrDefaultAsync(x => x.Id == id);
-        }
+        var team = await queryable
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync();
 
         if (team == null)
         {
-            throw new EntityNotFoundException(typeof(Team), id);
+            return null;
         }
+
+        var subTeams = await GetSubTeamsAsync(id, depth);
 
         // loop all sub-teams, and sort them by the given property
         if (sortChildrenBy != null)
         {
-            team.SortAllChildrenBy(sortChildrenBy);
+            subTeams.SortAllChildrenBy(sortChildrenBy);
         }
+
+        return subTeams;
+    }
+
+    public async Task<Dictionary<Guid, int>> GetUserTeamIdsAsync(Guid userId, int depth)
+    {
+        var tuQueryable = await _teamUserClosureRepository.GetQueryableAsync();
+
+        var teamIds = await tuQueryable
+            .Where(au => au.UserId == userId)
+            .Where(au => au.Depth <= depth)
+            .Select(au => new { au.TeamId, au.Depth })
+            .ToListAsync();
+
+        return teamIds.ToDictionary(x => x.TeamId, x => x.Depth);
+    }
+
+    public async Task<Dictionary<Team, int>> GetUserTeamsAsync(Guid userId, int depth)
+    {
+        var teamIdsDict = await GetUserTeamIdsAsync(userId, depth);
+        var teamIds = teamIdsDict.Keys.ToList();
+
+        var queryable = await GetQueryableAsync();
+
+        queryable = queryable
+            .Include(x => x.TeamUsers);
+
+
+        queryable = queryable
+            .Where(x => teamIds.Contains(x.Id));
+
+        var list = await queryable.ToListAsync();
+
+        var resDict = list.ToDictionary(x => x, x => teamIdsDict[x.Id]);
+
+        return resDict;
+    }
+
+    public async Task<Dictionary<Guid, int>> GetSubTeamIdsAsync(Guid teamId, int depth)
+    {
+        var teamClosureQueryable = await _teamClosureRepository.GetQueryableAsync();
+        var subTeamIds = await teamClosureQueryable
+            .Where(x => x.TeamId == teamId)
+            .Where(x => x.Depth <= depth)
+            .Select(x => new { x.ChildTeamId, x.Depth })
+            .ToListAsync();
+
+        var resDict = subTeamIds.ToDictionary(x => x.ChildTeamId, x => x.Depth);
+
+        return resDict;
+    }
+
+    public async Task<TeamDetailQueryDto> GetSubTeamsAsync(Guid teamId, int depth)
+    {
+        var teamIdsDict = await GetSubTeamIdsAsync(teamId, depth);
+        var teamIds = teamIdsDict.Keys.ToList();
+
+        var queryable = await GetQueryableAsync();
+
+        queryable = queryable
+            .Include(x => x.TeamUsers);
+
+        queryable = queryable
+            .Where(x => teamIds.Contains(x.Id));
+
+        var list = await queryable.ToListAsync();
+
+        var resDict = list.ToDictionary(x => x, x => teamIdsDict[x.Id]);
+
+        var team = TeamDetailQueryDto.FromDictionary(resDict);
 
         return team;
     }

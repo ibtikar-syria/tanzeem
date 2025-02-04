@@ -21,11 +21,11 @@ public static class TeamEfCoreQueryableExtensions
     }
 }
 
-public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvider, IGuidGenerator guidGenerator, IRepository<TeamUserClosure, Guid> teamUserClosureRepository, IRepository<TeamClosure, Guid> teamClosureRepository) : EfCoreRepository<TanzeemDbContext, Team, Guid>(dbContextProvider), ITeamRepository
+public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvider, IGuidGenerator guidGenerator, ITeamUserClosureRepository teamUserClosureRepository, ITeamClosureRepository teamClosureRepository) : EfCoreRepository<TanzeemDbContext, Team, Guid>(dbContextProvider), ITeamRepository
 {
     private readonly IGuidGenerator _guidGenerator = guidGenerator;
-    private readonly IRepository<TeamUserClosure, Guid> _teamUserClosureRepository = teamUserClosureRepository;
-    private readonly IRepository<TeamClosure, Guid> _teamClosureRepository = teamClosureRepository;
+    private readonly ITeamUserClosureRepository _teamUserClosureRepository = teamUserClosureRepository;
+    private readonly ITeamClosureRepository _teamClosureRepository = teamClosureRepository;
 
     public override async Task<IQueryable<Team>> WithDetailsAsync()
     {

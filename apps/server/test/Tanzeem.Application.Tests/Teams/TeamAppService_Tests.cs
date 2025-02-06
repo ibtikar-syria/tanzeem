@@ -327,9 +327,9 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         Assert.NotNull(result);
         // itself, 1.1, 1.2
         Assert.Equal(3, result.Children.Count);
-        Assert.Equal("Team 1", result.Children.ElementAt(0).Title);
-        Assert.Equal("Team 1.1", result.Children.ElementAt(1).Title);
-        Assert.Equal("Team 1.2", result.Children.ElementAt(2).Title);
+        Assert.Equal(("Team 1", 0), (result.Children.ElementAt(0).Title, result.Children.ElementAt(0).Depth));
+        Assert.Equal(("Team 1.1", 1), (result.Children.ElementAt(1).Title, result.Children.ElementAt(1).Depth));
+        Assert.Equal(("Team 1.2", 1), (result.Children.ElementAt(2).Title, result.Children.ElementAt(2).Depth));
     }
 
     [Fact]
@@ -341,15 +341,12 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
 
         var result = await service.GetDetailAsync(teams[0].Id, depth: 2, sortChildrenBy: "Title asc");
 
-        var firstChild = result.Children.ElementAt(0);
-        var secondChild = result.Children.ElementAt(1);
-        var thirdChild = result.Children.ElementAt(2);
-
         Assert.NotNull(result);
-        Assert.Equal(3, result.Children.Count);
-        Assert.Equal("Team 1", firstChild.Title);
-        Assert.Equal("Team 1.1", secondChild.Title);
-        Assert.Equal("Team 1.2", thirdChild.Title);
+        Assert.Equal(4, result.Children.Count);
+        Assert.Equal(("Team 1", 0), (result.Children.ElementAt(0).Title, result.Children.ElementAt(0).Depth));
+        Assert.Equal(("Team 1.1", 1), (result.Children.ElementAt(1).Title, result.Children.ElementAt(1).Depth));
+        Assert.Equal(("Team 1.1.1", 2), (result.Children.ElementAt(2).Title, result.Children.ElementAt(2).Depth));
+        Assert.Equal(("Team 1.2", 1), (result.Children.ElementAt(3).Title, result.Children.ElementAt(3).Depth));
     }
 
     [Fact]

@@ -62,6 +62,8 @@ public class TanzeemDbContext :
     public DbSet<AssignmentUser> AssignmentUsers { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<TeamUser> TeamUsers { get; set; }
+    public DbSet<TeamClosure> TeamClosures { get; set; }
+    public DbSet<TeamUserClosure> TeamUserClosures { get; set; }
 
     public TanzeemDbContext(DbContextOptions<TanzeemDbContext> options)
         : base(options)

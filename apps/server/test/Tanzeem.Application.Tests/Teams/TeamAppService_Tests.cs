@@ -166,7 +166,7 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         var result = await service.GetListAsync(new());
 
         Assert.NotNull(result);
-        Assert.Equal(3, result.Count);
+        Assert.Equal(7, result.Count);
     }
 
     [Fact]

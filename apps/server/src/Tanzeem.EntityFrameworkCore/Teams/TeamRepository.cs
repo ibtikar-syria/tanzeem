@@ -11,6 +11,7 @@ using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Guids;
 using Volo.Abp.Domain.Repositories;
 using System.Threading;
+using System.Linq.Dynamic.Core;
 
 namespace Tanzeem.Teams;
 
@@ -67,7 +68,8 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
             .WhereIf(!filter.TitleContains.IsNullOrWhiteSpace(), x => x.Title.Contains(filter.TitleContains!))
             .WhereIf(filter.TeamIds != null && filter.TeamIds?.Count > 0, x => filter.TeamIds!.Contains(x.Id))
             .WhereIf(filter.ParentId != null, x => x.ParentId == filter.ParentId)
-            .WhereIf(filter.AssignedUserIds != null && filter.AssignedUserIds?.Count > 0, x => x.TeamUsers.Any(au => filter.AssignedUserIds!.Contains(au.UserId)));
+            .WhereIf(filter.AssignedUserIds != null && filter.AssignedUserIds?.Count > 0, x => x.TeamUsers.Any(au => filter.AssignedUserIds!.Contains(au.UserId)))
+            .OrderBy(filter.Sorting ?? "Title asc");
 
         var list = await queryable.ToListAsync();
 
@@ -135,7 +137,7 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
         return resDict;
     }
 
-    public async Task<Dictionary<Guid, int>> GetSubTeamIdsAsync(Guid teamId, int depth)
+    public async Task<List<(Guid, int)>> GetSubTeamIdsAsync(Guid teamId, int depth)
     {
         var teamClosureQueryable = await _teamClosureRepository.GetQueryableAsync();
         var subTeamIds = await teamClosureQueryable
@@ -144,15 +146,15 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
             .Select(x => new { x.ChildTeamId, x.Depth })
             .ToListAsync();
 
-        var resDict = subTeamIds.ToDictionary(x => x.ChildTeamId, x => x.Depth);
+        var res = subTeamIds.Select(x => (x.ChildTeamId, x.Depth)).ToList();
 
-        return resDict;
+        return res;
     }
 
     public async Task<TeamDetailQueryDto> GetSubTeamsAsync(Guid teamId, int depth)
     {
         var teamIdsDict = await GetSubTeamIdsAsync(teamId, depth);
-        var teamIds = teamIdsDict.Keys.ToList();
+        var teamIds = teamIdsDict.Select(x => x.Item1).ToList();
 
         var queryable = await GetQueryableAsync();
 
@@ -164,7 +166,7 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
 
         var list = await queryable.ToListAsync();
 
-        var resDict = list.ToDictionary(x => x, x => teamIdsDict[x.Id]);
+        var resDict = list.ToDictionary(x => x, x => teamIdsDict.First(y => y.Item1 == x.Id).Item2);
 
         var team = TeamDetailQueryDto.FromDictionary(resDict);
 
@@ -215,7 +217,11 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
             var childClosure = new TeamClosure(_guidGenerator.Create(), team.Id, child.Id, 1);
             closures.Add(childClosure);
 
-            closures.AddRange(GetTeamClosuresFor(child));
+            var subClosures = GetTeamClosuresFor(child);
+            closures.AddRange(subClosures);
+
+            var parentSubClosures = subClosures.Select(x => new TeamClosure(_guidGenerator.Create(), team.Id, x.ChildTeamId, x.Depth + 1));
+            closures.AddRange(parentSubClosures);
         }
 
         return closures;
@@ -233,7 +239,11 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
 
         foreach (var child in team.Children)
         {
-            closures.AddRange(GetUserClosuresFor(child));
+            var childClosures = GetUserClosuresFor(child);
+            closures.AddRange(childClosures);
+
+            var parentChildClosures = childClosures.Select(x => new TeamUserClosure(_guidGenerator.Create(), team.Id, x.UserId, x.Depth + 1));
+            closures.AddRange(parentChildClosures);
         }
 
         return closures;

@@ -175,10 +175,10 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         await SeedTeams();
 
         var service = GetRequiredService<ITeamAppService>();
-        var result = await service.GetListAsync(new() { TitleContains = "Team 1" });
+        var result = await service.GetListAsync(new() { TitleContains = "Team 1", Sorting = "Title asc" });
 
         Assert.NotNull(result);
-        Assert.Single(result);
+        Assert.Equal(5, result.Count);
         Assert.Equal("Team 1", result[0].Title);
     }
 
@@ -390,36 +390,36 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
 
         var result = await service.GetDetailAsync(teams[0].Id, depth: 4, sortChildrenBy: "Title asc");
 
-        var firstChild = result.Children.ElementAt(0);
-        var first2ndChild = firstChild.Children.ElementAt(0);
-        var first3rdChild = first2ndChild.Children.ElementAt(0);
-        var second3rdChild = first2ndChild.Children.ElementAt(1);
-        var first4thChild = second3rdChild.Children.ElementAt(0);
-        var second4thChild = second3rdChild.Children.ElementAt(1);
+        var secondChild = result.Children.ElementAt(1);
+        var second2ndChild = secondChild.Children.ElementAt(0);
+        var first3rdChild = second2ndChild.Children.ElementAt(0);
+        var third3rdChild = second2ndChild.Children.ElementAt(1);
+        var first4thChild = third3rdChild.Children.ElementAt(0);
+        var third4thChild = third3rdChild.Children.ElementAt(1);
 
         Assert.NotNull(result);
-        Assert.NotNull(firstChild);
-        Assert.NotNull(first2ndChild);
+        Assert.NotNull(secondChild);
+        Assert.NotNull(second2ndChild);
         Assert.NotNull(first3rdChild);
-        Assert.NotNull(second3rdChild);
+        Assert.NotNull(third3rdChild);
         Assert.NotNull(first4thChild);
-        Assert.NotNull(second4thChild);
+        Assert.NotNull(third4thChild);
 
         Assert.Equal(2, result.Children.Count);
-        Assert.Equal("Team 1.1", firstChild.Title);
+        Assert.Equal("Team 1.1", secondChild.Title);
 
-        Assert.Single(firstChild.Children);
-        Assert.Equal("Team 1.1.1", first2ndChild.Title);
+        Assert.Single(secondChild.Children);
+        Assert.Equal("Team 1.1.1", second2ndChild.Title);
 
-        Assert.Equal(2, first2ndChild.Children.Count);
+        Assert.Equal(2, second2ndChild.Children.Count);
         Assert.Equal("Team 1.1.1.1", first3rdChild.Title);
-        Assert.Equal("Team 1.1.1.2", second3rdChild.Title);
+        Assert.Equal("Team 1.1.1.2", third3rdChild.Title);
 
         Assert.Empty(first3rdChild.Children);
 
-        Assert.Equal(2, second3rdChild.Children.Count);
+        Assert.Equal(2, third3rdChild.Children.Count);
         Assert.Equal("Team 1.1.1.2.1", first4thChild.Title);
-        Assert.Equal("Team 1.1.1.2.2", second4thChild.Title);
+        Assert.Equal("Team 1.1.1.2.2", third4thChild.Title);
     }
 
     [Fact]

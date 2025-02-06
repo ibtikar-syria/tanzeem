@@ -214,13 +214,12 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
 
         foreach (var child in team.Children)
         {
-            var childClosure = new TeamClosure(_guidGenerator.Create(), team.Id, child.Id, 1);
-            closures.Add(childClosure);
-
             var subClosures = GetTeamClosuresFor(child);
             closures.AddRange(subClosures);
 
-            var parentSubClosures = subClosures.Select(x => new TeamClosure(_guidGenerator.Create(), team.Id, x.ChildTeamId, x.Depth + 1));
+            var parentSubClosures = subClosures
+            // only the subitems that are already increased by the child, without the ones that belong to their subchildren, which are NOT one level below `team`
+            .Where(x => x.TeamId == child.Id).Select(x => new TeamClosure(_guidGenerator.Create(), team.Id, x.ChildTeamId, x.Depth + 1)).ToList();
             closures.AddRange(parentSubClosures);
         }
 

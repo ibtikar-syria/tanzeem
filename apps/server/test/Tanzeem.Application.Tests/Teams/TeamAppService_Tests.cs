@@ -325,9 +325,11 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         var result = await service.GetDetailAsync(teams[0].Id, depth: 1, sortChildrenBy: "Title asc");
 
         Assert.NotNull(result);
-        Assert.Equal(2, result.Children.Count);
-        Assert.Equal("Team 1.1", result.Children.ElementAt(0).Title);
-        Assert.Equal("Team 1.2", result.Children.ElementAt(1).Title);
+        // itself, 1.1, 1.2
+        Assert.Equal(3, result.Children.Count);
+        Assert.Equal("Team 1", result.Children.ElementAt(0).Title);
+        Assert.Equal("Team 1.1", result.Children.ElementAt(1).Title);
+        Assert.Equal("Team 1.2", result.Children.ElementAt(2).Title);
     }
 
     [Fact]

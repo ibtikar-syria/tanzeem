@@ -358,26 +358,15 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
 
         var result = await service.GetDetailAsync(teams[0].Id, depth: 3, sortChildrenBy: "Title asc");
 
-        var firstChild = result.Children.ElementAt(0);
-        var first2ndChild = firstChild.Children.ElementAt(0);
-        var first3rdChild = first2ndChild.Children.ElementAt(0);
-        var second3rdChild = first2ndChild.Children.ElementAt(1);
-
         Assert.NotNull(result);
-        Assert.NotNull(firstChild);
-        Assert.NotNull(first2ndChild);
-        Assert.NotNull(first3rdChild);
-        Assert.NotNull(second3rdChild);
+        Assert.Equal(6, result.Children.Count);
 
-        Assert.Equal(2, result.Children.Count);
-        Assert.Equal("Team 1.1", firstChild.Title);
-
-        Assert.Single(firstChild.Children);
-        Assert.Equal("Team 1.1.1", first2ndChild.Title);
-
-        Assert.Equal(2, first2ndChild.Children.Count);
-        Assert.Equal("Team 1.1.1.1", first3rdChild.Title);
-        Assert.Equal("Team 1.1.1.2", second3rdChild.Title);
+        Assert.Equal(("Team 1", 0), (result.Children.ElementAt(0).Title, result.Children.ElementAt(0).Depth));
+        Assert.Equal(("Team 1.1", 1), (result.Children.ElementAt(1).Title, result.Children.ElementAt(1).Depth));
+        Assert.Equal(("Team 1.1.1", 2), (result.Children.ElementAt(2).Title, result.Children.ElementAt(2).Depth));
+        Assert.Equal(("Team 1.1.1.1", 3), (result.Children.ElementAt(3).Title, result.Children.ElementAt(3).Depth));
+        Assert.Equal(("Team 1.1.1.2", 3), (result.Children.ElementAt(4).Title, result.Children.ElementAt(4).Depth));
+        Assert.Equal(("Team 1.2", 1), (result.Children.ElementAt(5).Title, result.Children.ElementAt(5).Depth));
     }
 
     [Fact]
@@ -389,36 +378,17 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
 
         var result = await service.GetDetailAsync(teams[0].Id, depth: 4, sortChildrenBy: "Title asc");
 
-        var secondChild = result.Children.ElementAt(1);
-        var second2ndChild = secondChild.Children.ElementAt(0);
-        var first3rdChild = second2ndChild.Children.ElementAt(0);
-        var third3rdChild = second2ndChild.Children.ElementAt(1);
-        var first4thChild = third3rdChild.Children.ElementAt(0);
-        var third4thChild = third3rdChild.Children.ElementAt(1);
-
         Assert.NotNull(result);
-        Assert.NotNull(secondChild);
-        Assert.NotNull(second2ndChild);
-        Assert.NotNull(first3rdChild);
-        Assert.NotNull(third3rdChild);
-        Assert.NotNull(first4thChild);
-        Assert.NotNull(third4thChild);
+        Assert.Equal(8, result.Children.Count);
 
-        Assert.Equal(2, result.Children.Count);
-        Assert.Equal("Team 1.1", secondChild.Title);
-
-        Assert.Single(secondChild.Children);
-        Assert.Equal("Team 1.1.1", second2ndChild.Title);
-
-        Assert.Equal(2, second2ndChild.Children.Count);
-        Assert.Equal("Team 1.1.1.1", first3rdChild.Title);
-        Assert.Equal("Team 1.1.1.2", third3rdChild.Title);
-
-        Assert.Empty(first3rdChild.Children);
-
-        Assert.Equal(2, third3rdChild.Children.Count);
-        Assert.Equal("Team 1.1.1.2.1", first4thChild.Title);
-        Assert.Equal("Team 1.1.1.2.2", third4thChild.Title);
+        Assert.Equal(("Team 1", 0), (result.Children.ElementAt(0).Title, result.Children.ElementAt(0).Depth));
+        Assert.Equal(("Team 1.1", 1), (result.Children.ElementAt(1).Title, result.Children.ElementAt(1).Depth));
+        Assert.Equal(("Team 1.1.1", 2), (result.Children.ElementAt(2).Title, result.Children.ElementAt(2).Depth));
+        Assert.Equal(("Team 1.1.1.1", 3), (result.Children.ElementAt(3).Title, result.Children.ElementAt(3).Depth));
+        Assert.Equal(("Team 1.1.1.2", 3), (result.Children.ElementAt(4).Title, result.Children.ElementAt(4).Depth));
+        Assert.Equal(("Team 1.1.1.2.1", 4), (result.Children.ElementAt(5).Title, result.Children.ElementAt(5).Depth));
+        Assert.Equal(("Team 1.1.1.2.2", 4), (result.Children.ElementAt(6).Title, result.Children.ElementAt(6).Depth));
+        Assert.Equal(("Team 1.2", 1), (result.Children.ElementAt(7).Title, result.Children.ElementAt(7).Depth));
     }
 
     [Fact]

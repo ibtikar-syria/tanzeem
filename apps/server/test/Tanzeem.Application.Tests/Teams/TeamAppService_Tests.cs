@@ -341,14 +341,13 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
 
         var firstChild = result.Children.ElementAt(0);
         var secondChild = result.Children.ElementAt(1);
+        var thirdChild = result.Children.ElementAt(2);
 
         Assert.NotNull(result);
-        Assert.Equal(2, result.Children.Count);
-        Assert.Equal("Team 1.1", firstChild.Title);
-        Assert.Equal("Team 1.2", secondChild.Title);
-
-        Assert.Single(firstChild.Children);
-        Assert.Equal("Team 1.1.1", firstChild.Children.ElementAt(0).Title);
+        Assert.Equal(3, result.Children.Count);
+        Assert.Equal("Team 1", firstChild.Title);
+        Assert.Equal("Team 1.1", secondChild.Title);
+        Assert.Equal("Team 1.2", thirdChild.Title);
     }
 
     [Fact]

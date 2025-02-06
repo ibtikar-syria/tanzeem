@@ -10,6 +10,7 @@ using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Guids;
 using Volo.Abp.Domain.Repositories;
+using System.Threading;
 
 namespace Tanzeem.Teams;
 
@@ -168,5 +169,73 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
         var team = TeamDetailQueryDto.FromDictionary(resDict);
 
         return team;
+    }
+
+    public override async Task<Team> InsertAsync(Team entity, bool autoSave = false, CancellationToken cancellationToken = default)
+    {
+        var res = await base.InsertAsync(entity, autoSave, cancellationToken);
+
+        var userClosures = GetUserClosuresFor(entity);
+        await _teamUserClosureRepository.InsertManyAsync(userClosures, autoSave, cancellationToken);
+
+        var teamClosures = GetTeamClosuresFor(entity);
+        await _teamClosureRepository.InsertManyAsync(teamClosures, autoSave, cancellationToken);
+
+        return res;
+    }
+
+    public override async Task InsertManyAsync(IEnumerable<Team> entities, bool autoSave = false, CancellationToken cancellationToken = default)
+    {
+        var teams = entities.ToList();
+
+        var userClosures = new List<TeamUserClosure>();
+        var teamClosures = new List<TeamClosure>();
+
+        foreach (var team in teams)
+        {
+            userClosures.AddRange(GetUserClosuresFor(team));
+            teamClosures.AddRange(GetTeamClosuresFor(team));
+        }
+
+        await _teamUserClosureRepository.InsertManyAsync(userClosures, autoSave, cancellationToken);
+        await _teamClosureRepository.InsertManyAsync(teamClosures, autoSave, cancellationToken);
+
+        await base.InsertManyAsync(teams, autoSave, cancellationToken);
+    }
+
+    private List<TeamClosure> GetTeamClosuresFor(Team team)
+    {
+        var closures = new List<TeamClosure>();
+
+        var parentClosure = new TeamClosure(_guidGenerator.Create(), team.Id, team.Id, 0);
+        closures.Add(parentClosure);
+
+        foreach (var child in team.Children)
+        {
+            var childClosure = new TeamClosure(_guidGenerator.Create(), team.Id, child.Id, 1);
+            closures.Add(childClosure);
+
+            closures.AddRange(GetTeamClosuresFor(child));
+        }
+
+        return closures;
+    }
+
+    private List<TeamUserClosure> GetUserClosuresFor(Team team)
+    {
+        var closures = new List<TeamUserClosure>();
+
+        foreach (var teamUser in team.TeamUsers)
+        {
+            var closure = new TeamUserClosure(_guidGenerator.Create(), team.Id, teamUser.UserId, 0);
+            closures.Add(closure);
+        }
+
+        foreach (var child in team.Children)
+        {
+            closures.AddRange(GetUserClosuresFor(child));
+        }
+
+        return closures;
     }
 }

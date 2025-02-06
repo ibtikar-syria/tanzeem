@@ -58,7 +58,7 @@ public class TeamDetailQueryDto : EntityEto<Guid>
 
     public void SortAllChildrenBy(string sortChildrenBy)
     {
-        if (Children == null)
+        if (Children == null || Children.Count == 0)
         {
             return;
         }

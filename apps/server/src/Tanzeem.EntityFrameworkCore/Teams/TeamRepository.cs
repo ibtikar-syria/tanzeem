@@ -94,13 +94,25 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
 
         var subTeams = await GetSubTeamsAsync(id, depth);
 
+        if (subTeams == null)
+        {
+            return null;
+        }
+
         // loop all sub-teams, and sort them by the given property
         if (sortChildrenBy != null)
         {
-            subTeams.SortAllChildrenBy(sortChildrenBy);
+            subTeams.ForEach(subTeam => subTeam.SortAllChildrenBy(sortChildrenBy));
         }
 
-        return subTeams;
+        var teamDetail = TeamDetailQueryDto.FromEntity(team, 0, subTeams);
+
+        if (sortChildrenBy != null)
+        {
+            teamDetail.SortAllChildrenBy(sortChildrenBy);
+        }
+
+        return teamDetail;
     }
 
     public async Task<Dictionary<Guid, int>> GetUserTeamIdsAsync(Guid userId, int depth)
@@ -151,7 +163,7 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
         return res;
     }
 
-    public async Task<TeamDetailQueryDto> GetSubTeamsAsync(Guid teamId, int depth)
+    public async Task<List<TeamDetailQueryDto>> GetSubTeamsAsync(Guid teamId, int depth)
     {
         var teamIdsDict = await GetSubTeamIdsAsync(teamId, depth);
         var teamIds = teamIdsDict.Select(x => x.Item1).ToList();
@@ -168,9 +180,9 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
 
         var resDict = list.ToDictionary(x => x, x => teamIdsDict.First(y => y.Item1 == x.Id).Item2);
 
-        var team = TeamDetailQueryDto.FromDictionary(resDict);
+        var teams = TeamDetailQueryDto.FromDictionary(resDict);
 
-        return team;
+        return teams;
     }
 
     public override async Task<Team> InsertAsync(Team entity, bool autoSave = false, CancellationToken cancellationToken = default)

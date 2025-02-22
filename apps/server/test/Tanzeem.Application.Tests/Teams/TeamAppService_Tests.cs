@@ -431,36 +431,36 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
 
         // Assert
 
-        var firstChild = result.Children.ElementAt(0);
-        var secondChild = result.Children.ElementAt(1);
-        var first2ndChild = firstChild.Children.ElementAt(0);
-        var first3rdChild = first2ndChild.Children.ElementAt(0);
-        var second3rdChild = first2ndChild.Children.ElementAt(1);
-        var third3rdChild = first2ndChild.Children.ElementAt(2);
-        var fourth3rdChild = first2ndChild.Children.ElementAt(3);
+        var fChild = result.Children.First(x => x.Title == "Team 1.1"); // 1.1
+        var sChild = result.Children.First(x => x.Title == "Team 1.2"); // 1.2
+        var fFChild = fChild.Children.ElementAt(0); // 1.1.1
+        var fFFChild = fFChild.Children.ElementAt(0); // 1.1.1.1
+        var fFSChild = fFChild.Children.ElementAt(1); // 1.1.1.4
+        var fFTChild = fFChild.Children.ElementAt(2); // 1.1.1.3
+        var fFFoChild = fFChild.Children.ElementAt(3); // 1.1.1.2
 
         Assert.NotNull(result);
-        Assert.NotNull(firstChild);
-        Assert.NotNull(secondChild);
-        Assert.NotNull(first2ndChild);
-        Assert.NotNull(first3rdChild);
-        Assert.NotNull(second3rdChild);
+        Assert.NotNull(fChild);
+        Assert.NotNull(sChild);
+        Assert.NotNull(fFChild);
+        Assert.NotNull(fFFChild);
+        Assert.NotNull(fFSChild);
 
-        Assert.Equal(2, result.Children.Count);
-        Assert.Equal("Team 1.1", firstChild.Title);
-        Assert.Equal("Team 1.2", secondChild.Title);
+        Assert.Equal(8, result.Children.Count);
+        Assert.Equal("Team 1.1", fChild.Title);
+        Assert.Equal("Team 1.2", sChild.Title);
 
-        Assert.Single(firstChild.Children);
-        Assert.Equal("Team 1.1.1", first2ndChild.Title);
+        Assert.Single(fChild.Children);
+        Assert.Equal("Team 1.1.1", fFChild.Title);
 
-        Assert.Equal(4, first2ndChild.Children.Count);
+        Assert.Equal(4, fFChild.Children.Count);
         // now
-        Assert.Equal("Team 1.1.1.1", first3rdChild.Title);
+        Assert.Equal("Team 1.1.1.1", fFFChild.Title);
         // 1 day ago, name bigger
-        Assert.Equal("Team 1.1.1.4", second3rdChild.Title);
+        Assert.Equal("Team 1.1.1.4", fFSChild.Title);
         // 1 day ago, name smaller
-        Assert.Equal("Team 1.1.1.3", third3rdChild.Title);
+        Assert.Equal("Team 1.1.1.3", fFTChild.Title);
         // 2 days ago
-        Assert.Equal("Team 1.1.1.2", fourth3rdChild.Title);
+        Assert.Equal("Team 1.1.1.2", fFFoChild.Title);
     }
 }

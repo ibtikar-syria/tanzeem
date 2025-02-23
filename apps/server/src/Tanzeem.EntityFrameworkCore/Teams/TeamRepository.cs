@@ -55,6 +55,13 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
         }
 
         await UpdateAsync(team);
+
+        var getAllClosuresQuer = await _teamClosureRepository.GetQueryableAsync();
+        var getAllClosures = await getAllClosuresQuer.Where(x => x.TeamId == teamId).ToListAsync();
+
+        var userClosures = userIds.Select(userId => getAllClosures.Select(x => new TeamUserClosure(_guidGenerator.Create(), x.ChildTeamId, userId, x.Depth))).SelectMany(x => x);
+
+        await _teamUserClosureRepository.InsertManyAsync(userClosures);
     }
 
     public async Task<List<Team>> GetListAsync(TeamListFilter filter)
@@ -185,15 +192,33 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
         return teams;
     }
 
+    public async Task SetUserClosuresAsync(Team entity)
+    {
+        var teamClosures = GetTeamClosuresFrom(entity);
+
+        var userClosures = entity.TeamUsers.Select(user => teamClosures.Select(x => new TeamUserClosure(_guidGenerator.Create(), x.ChildTeamId, user.Id, x.Depth))).SelectMany(x => x);
+
+        await _teamUserClosureRepository.InsertManyAsync(userClosures);
+    }
+
+    public async Task SetTeamClosuresAsync(Team entity)
+    {
+        var teamClosures = GetTeamClosuresFrom(entity);
+
+        if (teamClosures == null)
+        {
+            return;
+        }
+
+        await _teamClosureRepository.InsertManyAsync(teamClosures);
+    }
+
     public override async Task<Team> InsertAsync(Team entity, bool autoSave = false, CancellationToken cancellationToken = default)
     {
         var res = await base.InsertAsync(entity, autoSave, cancellationToken);
 
-        var userClosures = GetUserClosuresFor(entity);
-        await _teamUserClosureRepository.InsertManyAsync(userClosures, autoSave, cancellationToken);
-
-        var teamClosures = GetTeamClosuresFor(entity);
-        await _teamClosureRepository.InsertManyAsync(teamClosures, autoSave, cancellationToken);
+        await SetTeamClosuresAsync(entity);
+        await SetUserClosuresAsync(entity);
 
         return res;
     }
@@ -202,22 +227,17 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
     {
         var teams = entities.ToList();
 
-        var userClosures = new List<TeamUserClosure>();
-        var teamClosures = new List<TeamClosure>();
 
         foreach (var team in teams)
         {
-            userClosures.AddRange(GetUserClosuresFor(team));
-            teamClosures.AddRange(GetTeamClosuresFor(team));
+            await SetTeamClosuresAsync(team);
+            await SetUserClosuresAsync(team);
         }
-
-        await _teamUserClosureRepository.InsertManyAsync(userClosures, autoSave, cancellationToken);
-        await _teamClosureRepository.InsertManyAsync(teamClosures, autoSave, cancellationToken);
 
         await base.InsertManyAsync(teams, autoSave, cancellationToken);
     }
 
-    private List<TeamClosure> GetTeamClosuresFor(Team team)
+    private List<TeamClosure> GetTeamClosuresFrom(Team team)
     {
         var closures = new List<TeamClosure>();
 
@@ -226,7 +246,7 @@ public class TeamRepository(IDbContextProvider<TanzeemDbContext> dbContextProvid
 
         foreach (var child in team.Children)
         {
-            var subClosures = GetTeamClosuresFor(child);
+            var subClosures = GetTeamClosuresFrom(child);
             closures.AddRange(subClosures);
 
             var parentSubClosures = subClosures

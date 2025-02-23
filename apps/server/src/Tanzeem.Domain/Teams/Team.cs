@@ -5,6 +5,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 using System.Linq.Dynamic.Core;
 using Volo.Abp.MultiTenancy;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Identity;
 
 namespace Tanzeem.Teams;
 

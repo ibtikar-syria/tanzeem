@@ -56,6 +56,16 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
 
         return users;
     }
+    private async Task<IdentityUser> SeedUser()
+    {
+        // adnan{timenow}@gmail.com
+        var email = $"adnan{DateTime.Now:yyyyMMddHHmmss}@gmail.com";
+        IdentityUser user = new(id: Guid.NewGuid(), userName: "user1", email: email);
+
+        await _userRepository.InsertAsync(user);
+
+        return user;
+    }
 
     private async Task<List<Team>> SeedTeamsWithUsers()
     {
@@ -94,6 +104,7 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
     [Fact]
     public async Task Should_Assign_Sub_Teams_To_User()
     {
+        var ogUser = await SeedUser();
         var users = await SeedUsers();
 
         var tid1 = Guid.NewGuid();
@@ -102,12 +113,17 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         var tid4 = Guid.NewGuid();
         var tid5 = Guid.NewGuid();
 
-        var team = new Team(tid1, "Team 1", children: [
-            new(id: tid2, title: "Team 1.1", children: [
-                new(id: tid3, title: "Team 1.1.1"),
+        var t2 = new Team(id: tid2, title: "Team 1.1", children: [
+                        new(id: tid3, title: "Team 1.1.1"),
                 new(id: tid4, title: "Team 1.1.2"),
-            ]),
-            new(id: tid5, title: "Team 1.2")
+            ]);
+        // adding this bit to spice things up
+        t2.AssignUsers(new Dictionary<Guid, Guid>
+        {
+            { Guid.NewGuid(), ogUser.Id },
+        });
+        var team = new Team(tid1, "Team 1", children: [
+            t2, new(id: tid5, title: "Team 1.2")
         ]);
 
         await _teamRepository.InsertAsync(team);
@@ -120,19 +136,15 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
         var teams = await _teamRepository.GetUserTeamsAsync(userIds[0], depth: 3);
 
         Assert.NotNull(teamIds);
+        Assert.Equal(5, teamIds.Count);
+        Assert.Equal(teamIds, teams.ToDictionary(x => x.Key.Id, x => x.Value));
+
         Assert.Contains(team.Id, teamIds);
         Assert.Contains(tid1, teamIds);
         Assert.Contains(tid2, teamIds);
         Assert.Contains(tid3, teamIds);
         Assert.Contains(tid4, teamIds);
         Assert.Contains(tid5, teamIds);
-
-        Assert.NotNull(teams);
-        Assert.Contains(team, teams);
-        Assert.Contains(team.Children.ElementAt(0), teams);
-        Assert.Contains(team.Children.ElementAt(0).Children.ElementAt(0), teams);
-        Assert.Contains(team.Children.ElementAt(0).Children.ElementAt(1), teams);
-        Assert.Contains(team.Children.ElementAt(1), teams);
     }
 
     [Fact]

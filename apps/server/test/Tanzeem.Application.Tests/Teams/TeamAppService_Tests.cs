@@ -214,12 +214,11 @@ public abstract class TeamAppService_Tests<TStartupModule> : TanzeemApplicationT
     {
         var teams = await SeedTeamsWithUsers();
 
-        var first = teams[0];
+        var first = teams.First(x => x.Title == "Team 1");
+        var second = teams.First(x => x.Title == "Team 2");
+        var third = teams.First(x => x.Title == "Team 3");
 
-        var second = teams[1];
         var secondUserIds = second!.TeamUsers.Select(au => au.UserId).ToList();
-
-        var third = teams[2];
         var thirdUserIds = third!.TeamUsers.Select(au => au.UserId).ToList();
 
         var service = GetRequiredService<ITeamAppService>();

@@ -4,12 +4,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Tanzeem.Assignments.Dtos;
 using Tanzeem.Permissions;
-using Volo.Abp.Application.Services;
 
 namespace Tanzeem.Assignments;
 
 [Authorize(TanzeemPermissions.Assignments.Default)]
-public class AssignmentAppService : ApplicationService, IAssignmentAppService
+public class AssignmentAppService : TanzeemAppService, IAssignmentAppService
 {
     private readonly IAssignmentRepository _assignmentRepository;
 

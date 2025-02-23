@@ -4,13 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Tanzeem.Teams.Dtos;
 using Tanzeem.Permissions;
-using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 
 namespace Tanzeem.Teams;
 
 [Authorize(TanzeemPermissions.Teams.Default)]
-public class TeamAppService : ApplicationService, ITeamAppService
+public class TeamAppService : TanzeemAppService, ITeamAppService
 {
     private readonly ITeamRepository _teamRepository;
 
